@@ -1,0 +1,46 @@
+{
+  "name": "calendar-helper",
+  "version": "0.0.2",
+  "description": "calender helper, no view, only calender data and methods",
+  "main": "dist/index.js",
+  "files": [
+    "dist/index.js",
+    "LICENSE",
+    "README.md",
+    "package.json"
+  ],
+  "scripts": {
+    "test": "mocha ./dist/test/test.js"
+  },
+  "nyc": {
+    "include": [
+      "dist/test/test.js"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sun2dan/calendar-helper.git"
+  },
+  "keywords": [
+    "calendar",
+    "calendar helper",
+    "calendar tools",
+    "calendar method",
+    "calendar data"
+  ],
+  "author": "sun2dan <supericesun@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sun2dan/calendar-helper/issues"
+  },
+  "homepage": "https://github.com/sun2dan/calendar-helper#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0"
+  },
+  "dependencies": {
+    "format-tools": "0.0.1"
+  }
+}

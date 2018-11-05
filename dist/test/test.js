@@ -1,0 +1,423 @@
+'use strict';
+
+var _index = require('../index');
+
+var _index2 = _interopRequireDefault(_index);
+
+var _formatTools = require('format-tools');
+
+var _formatTools2 = _interopRequireDefault(_formatTools);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var getDateStr = _formatTools2.default.formatDate;
+//let assert = require('assert');
+var expect = require('chai').expect;
+
+describe('CalendarHelper.getCalendar', function () {
+  /*
+    let res = CalendarHelper.getCalendarData({
+    cur: new Date(), // 当前日期
+    start: {year: 2020, month: 3}, // 开始日期
+    //interval: {year: 1, month: 5},  // 时间间隔
+    interval: 2,  // 时间间隔
+    fixRows: true, // 是否固定6行 true-6行
+    });     */
+  it('1 开始时间设为2018-11，对象类型，时间间隔设置为1，获取到11月份的数据，并选中11-30', function () {
+    var res = _index2.default.getCalendar({ year: 2018, month: 11 }, 1, { cur: new Date(2018, 10, 30) });
+    toEqual(res.length, 5);
+    toEqual(res[0].length, 7);
+    toEqual(res[0][4].dateStr, '2018-11-01');
+    toEqual(res[4][5].today, true); // 11-30选中
+    toEqual(res[4][6].dateStr, '2018-12-01');
+  });
+  it('2 开始时间设为2018-11，日期类型，时间间隔设置为1，获取到11月份的数据，并选中11-30', function () {
+    var res = _index2.default.getCalendar(new Date(2018, 10), 1, { cur: new Date(2018, 10, 30) });
+    toEqual(res.length, 5);
+    toEqual(res[0].length, 7);
+    toEqual(res[0][4].dateStr, '2018-11-01');
+    toEqual(res[4][5].today, true); // 11-30选中
+    toEqual(res[4][6].dateStr, '2018-12-01');
+  });
+  it('3 开始时间设为2018-11，时间戳类型，时间间隔设置为1，获取到11月份的数据，并选中11-30', function () {
+    var res = _index2.default.getCalendar(new Date(2018, 10).getTime(), 1, { cur: new Date(2018, 10, 30) });
+    toEqual(res.length, 5);
+    toEqual(res[0].length, 7);
+    toEqual(res[0][4].dateStr, '2018-11-01');
+    toEqual(res[4][5].today, true); // 11-30选中
+    toEqual(res[4][6].dateStr, '2018-12-01');
+  });
+  it('4 开始时间设为2018-11，时间间隔设置为对象，1年1个月，获取到2018-11到2019-11月的数据', function () {
+    var res = _index2.default.getCalendar(new Date(2018, 10), { year: 1, month: 1 });
+    toEqual(res.length, 13);
+    toEqual(res[0][1][0].dateStr, '2018-11-04'); // 2018-11的第二周第一天：11-04
+    toEqual(res[7][1][0].dateStr, '2019-06-02'); // 2019-06的第二周第一天：06-02
+    toEqual(res[12][1][0].dateStr, '2019-11-03'); // 2019-11的第二周第一天：11-03
+  });
+  it('5 开始时间设为2018-11，时间间隔设置为对象，往前推1年1个月，获取到2017-11到2018-11月的数据', function () {
+    var res = _index2.default.getCalendar(new Date(2018, 10), { year: 1, month: 1, past: true });
+    toEqual(res.length, 13);
+    toEqual(res[0][1][0].dateStr, '2017-10-08'); // 2017-10的第二周第一天
+    toEqual(res[7][1][0].dateStr, '2018-05-06'); // 2018-04的第二周第一天
+    toEqual(res[12][1][0].dateStr, '2018-10-07'); // 2018-11的第二周第一天
+  });
+  it('6 开始时间设为2018-11，时间间隔设置为对象，0年1个月，获取到2018-11的数据，6行', function () {
+    var res = _index2.default.getCalendar(new Date(2018, 10), { year: 0, month: 1 }, { fixRows: true });
+    toEqual(res.length, 6);
+  });
+  it('7 开始时间设为2018-11，时间间隔设置为对象，往前推0年1个月，获取到2018-10的数据，6行', function () {
+    var res = _index2.default.getCalendar(new Date(2018, 10), { year: 0, month: 1, past: true }, { fixRows: true });
+    toEqual(res.length, 6);
+    toEqual(res[1][0].dateStr, '2018-10-07');
+  });
+});
+
+describe('CalendarHelper.parseDate', function () {
+  it('1 不传参数，默认为当前时间（精确到秒）', function () {
+    var seconds = parseInt(_index2.default.parseDate() / 1000);
+    toEqual(seconds, parseInt(new Date() / 1000));
+  });
+  it('2 传日期对象，得到一个拷贝(不等于原对象但值相等）', function () {
+    var date = new Date(2018, 10, 1);
+    var orig = _index2.default.parseDate(date);
+    toEqual(orig.getTime(), date.getTime()); // 值相等
+    date.setMonth(11);
+    expect(orig.getTime()).to.not.equal(date.getTime()); // 不等于原对象
+  });
+  it('3 传时间戳或时间戳字符串，得到一个日期对象', function () {
+    var date = new Date(2018, 10, 1);
+    var ts = date.getTime();
+    toBeA(_index2.default.parseDate(ts), 'date');
+    toBeA(_index2.default.parseDate(ts.toString()), 'date');
+  });
+});
+
+describe('CalendarHelper.addMonth', function () {
+  it('1 不传参数默认为1：2018年11月，往后一个月为2018年12月', function () {
+    var date = new Date(2018, 10);
+    var orig = _index2.default.addMonth(date);
+    var compare = new Date(2018, 11);
+    toEqual(orig.getFullYear(), compare.getFullYear());
+    toEqual(orig.getMonth(), compare.getMonth());
+  });
+  it('2 2018年11月，往后两个月为2019年1月', function () {
+    var date = new Date(2018, 10);
+    var orig = _index2.default.addMonth(date, 2);
+    var compare = new Date(2019, 0);
+    toEqual(orig.getFullYear(), compare.getFullYear());
+    toEqual(orig.getMonth(), compare.getMonth());
+  });
+  it('3 2018年11月，往前两个月为2018年9月', function () {
+    var date = new Date(2018, 10);
+    var orig = _index2.default.addMonth(date, -2);
+    var compare = new Date(2018, 8);
+    toEqual(orig.getFullYear(), compare.getFullYear());
+    toEqual(orig.getMonth(), compare.getMonth());
+  });
+});
+
+describe('CalendarHelper.addYear', function () {
+  it('1 第二个参数不传默认为1：2018年11月，往后一年为2019年11月', function () {
+    var date = new Date(2018, 10);
+    var orig = _index2.default.addYear(date);
+    var compare = new Date(2019, 10);
+    toEqual(orig.getFullYear(), compare.getFullYear());
+    toEqual(orig.getMonth(), compare.getMonth());
+  });
+  it('2 2018年11月，往后两年为2020年11月', function () {
+    var date = new Date(2018, 10);
+    var orig = _index2.default.addYear(date, 2);
+    var compare = new Date(2020, 10);
+    toEqual(orig.getFullYear(), compare.getFullYear());
+    toEqual(orig.getMonth(), compare.getMonth());
+  });
+  it('3 2018年11月，往前两年为2020年11月', function () {
+    var date = new Date(2018, 10);
+    var orig = _index2.default.addYear(date, 2);
+    var compare = new Date(2020, 10);
+    toEqual(orig.getFullYear(), compare.getFullYear());
+    toEqual(orig.getMonth(), compare.getMonth());
+  });
+});
+
+describe('CalendarHelper.getMonthData', function () {
+  it('1 获取2018年11月份的日历数据，并选中30号，不固定行数', function () {
+    var compare = {
+      prevLastDay: {
+        curMonth: -1, // 是否为当前月
+        today: false, // 是否为当前日期
+        date: new Date(2018, 9, 31), // 日期对象
+        ts: new Date(2018, 9, 31).getTime(), //时间戳
+        year: 2018, // 年
+        month: 10, //月 1-12
+        day: 31, // 日    1-31
+        week: 3, //周几   0-6
+        weekIdx: 5, // 当月的第几周 1-6
+        days: 31, // 当月天数 28-31
+        dateStr: '2018-10-31' // 日期字符串
+      },
+      curFirstDay: {
+        curMonth: 0,
+        today: false,
+        date: new Date(2018, 10, 1),
+        ts: new Date(2018, 10, 1).getTime(),
+        year: 2018,
+        month: 11,
+        day: 1,
+        week: 4,
+        weekIdx: 1,
+        days: 30,
+        dateStr: '2018-11-01'
+      },
+      curLastDay: {
+        curMonth: 0,
+        today: true,
+        date: new Date(2018, 10, 30),
+        ts: new Date(2018, 10, 30).getTime(),
+        year: 2018,
+        month: 11,
+        day: 30,
+        week: 5,
+        weekIdx: 5,
+        days: 30,
+        dateStr: '2018-11-30'
+      },
+      lastFirstDay: {
+        curMonth: 1,
+        today: false,
+        date: new Date(2018, 11, 1),
+        ts: new Date(2018, 11, 1).getTime(),
+        year: 2018,
+        month: 12,
+        day: 1,
+        week: 6,
+        weekIdx: 1,
+        days: 31,
+        dateStr: '2018-12-01'
+      }
+    };
+    var cur = new Date(2018, 10, 30);
+
+    var orig = _index2.default.getMonthData(new Date(2018, 10), cur, false);
+    toEqual(orig.length, 5); // 5周/行
+    toEqual(orig[0].length, 7); // 7列
+
+    var prevLastDay = orig[0][3]; // 10-31
+    var curFirstDay = orig[0][4]; // 11-30
+    var curLastDay = orig[4][5]; // 11-30
+    var lastFirstDay = orig[4][6]; // 12-01
+
+    var arr = ['prevLastDay', 'curFirstDay', 'curLastDay', 'lastFirstDay'];
+    [prevLastDay, curFirstDay, curLastDay, lastFirstDay].forEach(function (item, i) {
+      var key = arr[i];
+      toDeepEqual(item, compare[key]);
+    });
+  });
+  it('2 获取2018年11月份的日历数据，固定6行', function () {
+    var cur = new Date(2018, 10, 30);
+    var orig = _index2.default.getMonthData(new Date(2018, 10), cur, true);
+    toEqual(orig.length, 6);
+  });
+  it('3 选中日期不传或传空，默认为当前日期', function () {
+    var now = new Date();
+    var orig = _index2.default.getMonthData(new Date(2018, 10));
+    var orig1 = _index2.default.getMonthData(new Date(2018, 10), null, 6);
+    var res = [];
+    [orig, orig1].forEach(function (data) {
+      data.forEach(function (week) {
+        week.forEach(function (day) {
+          if (day.today) res.push(day.dateStr);
+        });
+      });
+    });
+    res.forEach(function (item) {
+      toEqual(item, getDateStr(now));
+    });
+  });
+});
+
+describe('CalendarHelper.getDays', function () {
+  it('1 2020年2月有29天，2019年2月有28天', function () {
+    var orig = _index2.default.getDays(new Date(2020, 1));
+    toEqual(orig, 29);
+    var orig1 = _index2.default.getDays(new Date(2019, 1));
+    toEqual(orig1, 28);
+  });
+  it('2 1/3/5/7/8/10/12月份有31天', function () {
+    [1, 3, 5, 7, 8, 10, 12].forEach(function (n, i) {
+      var orig = _index2.default.getDays(new Date(2018, n - 1));
+      toEqual(orig, 31);
+    });
+  });
+  it('3 4/6/9/11月份有30天', function () {
+    [4, 6, 9, 11].forEach(function (n, i) {
+      var orig = _index2.default.getDays(new Date(2018, n - 1));
+      toEqual(orig, 30);
+    });
+  });
+});
+
+describe('CalendarHelper.getWeeks', function () {
+  it('1 2018年11月有5周', function () {
+    var orig = _index2.default.getWeeks(new Date(2018, 10));
+    toEqual(orig, 5);
+  });
+  it('2 2018年12月有6周', function () {
+    var orig = _index2.default.getWeeks(new Date(2018, 11));
+    toEqual(orig, 6);
+  });
+  it('3 2026年2月有4周', function () {
+    var orig = _index2.default.getWeeks(new Date(2026, 1));
+    toEqual(orig, 4);
+  });
+});
+
+describe('CalendarHelper.getWeekByDate', function () {
+  it('1 2018年11月1号在当月第1周', function () {
+    var orig = _index2.default.getWeekByDate(new Date(2018, 10, 1));
+    toEqual(orig, 1);
+  });
+  it('2 2018年11月22号在当月第4周', function () {
+    var orig = _index2.default.getWeekByDate(new Date(2018, 10, 22));
+    toEqual(orig, 4);
+  });
+  it('3 2018年11月30号在第5周', function () {
+    var orig = _index2.default.getWeekByDate(new Date(2018, 10, 30));
+    toEqual(orig, 5);
+  });
+});
+
+describe('CalendarHelper.getMonthFirstWeek', function () {
+  it('1 2018年11月的第一天是周四', function () {
+    var orig = _index2.default.getMonthFirstWeek(new Date(2018, 10));
+    toEqual(orig, 4);
+  });
+  it('2 2018年12月的第一天是周六', function () {
+    var orig = _index2.default.getMonthFirstWeek(new Date(2018, 11));
+    toEqual(orig, 6);
+  });
+});
+
+describe('CalendarHelper.prevMonth / nextMonth / prevYear / nextYear', function () {
+  it('1 获取2018年11月前一个月（2018年10月）的数据', function () {
+    var date = new Date(2018, 10);
+    var orig = _index2.default.prevMonth(date);
+    toEqual(orig.length, 5);
+    toEqual(orig[0].length, 7);
+    toEqual(orig[1][0].dateStr, '2018-10-07'); // 10月第二周第一天是7号
+  });
+  it('2 获取2018年11月后一个月（2018年12月）的数据', function () {
+    var date = new Date(2018, 10);
+    var orig = _index2.default.nextMonth(date);
+    toEqual(orig.length, 6); // 2018年12月有6周
+    toEqual(orig[0].length, 7);
+    toEqual(orig[1][0].dateStr, '2018-12-02'); // 10月第二周第一天是7号
+  });
+  it('3 获取2018年11月前一年（2017年11月）的数据', function () {
+    var date = new Date(2018, 10);
+    var orig = _index2.default.prevYear(date);
+    toEqual(orig.length, 5);
+    toEqual(orig[0].length, 7);
+    toEqual(orig[1][0].dateStr, '2017-11-05'); // 第二周第一天
+  });
+  it('4 获取2018年11月后一年（2019年11月）的数据', function () {
+    var date = new Date(2018, 10);
+    var orig = _index2.default.nextYear(date);
+    toEqual(orig.length, 5); // 2019年11月有5周
+    toEqual(orig[0].length, 7);
+    toEqual(orig[1][0].dateStr, '2019-11-03'); // 10月第二周第一天是7号
+  });
+});
+/*
+describe('CalendarHelper.getAddMonthRangeData', function () {
+  it('1 获取2018年11月前一个月（2018年10月）的数据', function () {
+    let date = new Date(2018, 10);
+    let count = -1;
+    let orig = CalendarHelper.getAddMonthRangeData(date, count);
+    toEqual(orig.length, 5);
+    toEqual(orig[0].length, 7);
+    toEqual(orig[1][0].dateStr, '2018-10-07'); // 10月第二周第一天是7号
+  });
+  it('2 获取2018年11月前3个月（2018-8到2018-10）的数据', function () {
+    let date = new Date(2018, 10);
+    let count = -3;
+    let orig = CalendarHelper.getAddMonthRangeData(date, count);
+    toEqual(orig.length, 3);
+    toEqual(orig[0][1][0].dateStr, '2018-08-05'); // 第一个月(8月)第二周第一天
+    toEqual(orig[1][1][0].dateStr, '2018-09-02'); // 第二个月(9月)第二周第一天
+    toEqual(orig[2][1][0].dateStr, '2018-10-07'); // 第三个月(10月)第二周第一天
+  });
+  it('3 获取2018年11月后一个月（2018年12月）的数据', function () {
+    let date = new Date(2018, 10);
+    let count = 1;
+    let orig = CalendarHelper.getAddMonthRangeData(date, count);
+    toEqual(orig.length, 6);
+    toEqual(orig[0].length, 7);
+    toEqual(orig[1][0].dateStr, '2018-12-02'); // 12月第二周第一天
+  });
+  it('4 获取2018年11月后3个月（2018-12到2019-02）的数据', function () {
+    let date = new Date(2018, 10);
+    let count = 3;
+    let orig = CalendarHelper.getAddMonthRangeData(date, count);
+    toEqual(orig.length, 3);
+    toEqual(orig[0][1][0].dateStr, '2018-12-02'); // 第一个月(8月)第二周第一天
+    toEqual(orig[1][1][0].dateStr, '2019-01-06'); // 第二个月(9月)第二周第一天
+    toEqual(orig[2][1][0].dateStr, '2019-02-03'); // 第三个月(10月)第二周第一天
+  });
+});
+
+describe('CalendarHelper.getAddYearRangeData', function () {
+  it('1 获取2018年11月前一年（2017年10月）的数据', function () {
+    let date = new Date(2018, 10);
+    let count = -1;
+    let orig = CalendarHelper.getAddYearRangeData(date, count);
+    toEqual(orig.length, 5);
+    toEqual(orig[0].length, 7);
+    toEqual(orig[1][0].dateStr, '2018-10-07'); // 10月第二周第一天是7号
+  });
+  it('2 获取2018年11月前3个月（2018-8到2018-10）的数据', function () {
+    let date = new Date(2018, 10);
+    let count = -3;
+    let orig = CalendarHelper.getAddYearRangeData(date, count);
+    toEqual(orig.length, 3);
+    toEqual(orig[0][1][0].dateStr, '2018-08-05'); // 第一个月(8月)第二周第一天
+    toEqual(orig[1][1][0].dateStr, '2018-09-02'); // 第二个月(9月)第二周第一天
+    toEqual(orig[2][1][0].dateStr, '2018-10-07'); // 第三个月(10月)第二周第一天
+  });
+  it('3 获取2018年11月后一个月（2018年12月）的数据', function () {
+    let date = new Date(2018, 10);
+    let count = 1;
+    let orig = CalendarHelper.getAddYearRangeData(date, count);
+    toEqual(orig.length, 6);
+    toEqual(orig[0].length, 7);
+    toEqual(orig[1][0].dateStr, '2018-12-02'); // 12月第二周第一天
+  });
+  it('4 获取2018年11月后3个月（2018-12到2019-02）的数据', function () {
+    let date = new Date(2018, 10);
+    let count = 3;
+    let orig = CalendarHelper.getAddYearRangeData(date, count);
+    toEqual(orig.length, 3);
+    toEqual(orig[0][1][0].dateStr, '2018-12-02'); // 第一个月(8月)第二周第一天
+    toEqual(orig[1][1][0].dateStr, '2019-01-06'); // 第二个月(9月)第二周第一天
+    toEqual(orig[2][1][0].dateStr, '2019-02-03'); // 第三个月(10月)第二周第一天
+  });
+});*/
+
+/*describe('CalendarHelper.Calendar 测试创建对象', function () {
+  calendarInit(true)
+});
+describe('CalendarHelper.Calendar 测试对象上的方法', function () {
+
+});*/
+
+function toEqual(orig, compare) {
+  expect(orig).to.equal(compare);
+}
+
+function toDeepEqual(orig, compare) {
+  expect(orig).to.deep.equal(compare);
+}
+
+function toBeA(orig, type) {
+  expect(orig).to.be.a(type);
+}
