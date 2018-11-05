@@ -54,8 +54,8 @@ var CalendarHelper = {
   getCalendar: function getCalendar(start, interval, opts) {
     opts = opts || {};
     start = formatStart(start);
-    var past = interval && interval.past === true;
-    interval = formatInterval(interval);
+    var past = interval && interval.past === true || interval < 0;
+    interval = Math.abs(formatInterval(interval));
 
     opts.cur = CalendarHelper.parseDate(opts.cur);
     var end = CalendarHelper.addMonth(start, past ? -interval : interval);

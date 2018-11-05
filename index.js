@@ -47,8 +47,8 @@ let CalendarHelper = {
   getCalendar(start, interval, opts) {
     opts = opts || {};
     start = formatStart(start);
-    let past = interval && interval.past === true;
-    interval = formatInterval(interval);
+    let past = interval && (interval.past === true) || interval < 0;
+    interval = Math.abs(formatInterval(interval));
 
     opts.cur = CalendarHelper.parseDate(opts.cur);
     let end = CalendarHelper.addMonth(start, past ? -interval : interval);

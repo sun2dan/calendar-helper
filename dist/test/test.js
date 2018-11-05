@@ -70,6 +70,19 @@ describe('CalendarHelper.getCalendar', function () {
     toEqual(res.length, 6);
     toEqual(res[1][0].dateStr, '2018-10-07');
   });
+  it('8 开始时间设为2018-11，时间间隔设置为对象，往前推1个月，获取到2018-10的数据', function () {
+    var res = _index2.default.getCalendar(new Date(2018, 10), -1);
+    toEqual(res.length, 5);
+    toEqual(res[1][0].dateStr, '2018-10-07');
+    toEqual(res[4][3].dateStr, '2018-10-31');
+  });
+  it('9 开始时间设为2018-11，不设置时间间隔，获取到2018-11的数据', function () {
+    var res = _index2.default.getCalendar(new Date(2018, 10).getTime());
+    toEqual(res.length, 5);
+    toEqual(res[0].length, 7);
+    toEqual(res[0][4].dateStr, '2018-11-01');
+    toEqual(res[4][6].dateStr, '2018-12-01');
+  });
 });
 
 describe('CalendarHelper.parseDate', function () {
