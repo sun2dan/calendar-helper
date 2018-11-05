@@ -11,7 +11,7 @@ var _formatTools2 = _interopRequireDefault(_formatTools);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var getType = _formatTools2.default.getType;
-var getDateStr = _formatTools2.default.formatDate;
+var formatDate = _formatTools2.default.formatDate;
 
 /**
  * 格式化开始时间
@@ -144,9 +144,7 @@ var CalendarHelper = {
     var maxDays = CalendarHelper.getDays(date);
     var firstDayWeek = CalendarHelper.getMonthFirstWeek(date);
     var resultArr = [];
-    var curD = CalendarHelper.parseDate(curDate);
-    var today = curD.getDate();
-    var curYear = curD.getFullYear();
+    var curStr = formatDate(curDate);
     var weekLen = fixRows === true ? 6 : CalendarHelper.getWeeks(date);
 
     for (var w = 0; w < weekLen; w++) {
@@ -177,8 +175,6 @@ var CalendarHelper = {
           // 下个月
           day.curMonth = 1;
           day.date = new Date(year, month + 1, dayNum - maxDays);
-        } else if (dayNum === today && curYear === day.date.getFullYear()) {
-          day.today = true;
         }
         var tmpDate = day.date;
         day.ts = tmpDate.getTime();
@@ -188,8 +184,8 @@ var CalendarHelper = {
         day.week = tmpDate.getDay();
         day.weekIdx = CalendarHelper.getWeekByDate(tmpDate);
         day.days = CalendarHelper.getDays(tmpDate);
-        day.dateStr = getDateStr(tmpDate);
-
+        day.dateStr = formatDate(tmpDate);
+        if (day.dateStr === curStr) day.today = true;
         arr.push(day);
       }
       resultArr.push(arr);

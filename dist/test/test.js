@@ -47,12 +47,16 @@ describe('CalendarHelper.getCalendar', function () {
     toEqual(res[4][5].today, true); // 11-30选中
     toEqual(res[4][6].dateStr, '2018-12-01');
   });
-  it('4 开始时间设为2018-11，时间间隔设置为对象，1年1个月，获取到2018-11到2019-11月的数据', function () {
-    var res = _index2.default.getCalendar(new Date(2018, 10), { year: 1, month: 1 });
+  it('4 开始时间设为2018-11，时间间隔设置为对象，1年1个月，获取到2018-11到2019-11月的数据，其他月份的20号10不选中(设置当前时间为2018-11-10)', function () {
+    var res = _index2.default.getCalendar(new Date(2018, 10), { year: 1, month: 1 }, { cur: new Date(2018, 10, 20) });
     toEqual(res.length, 13);
     toEqual(res[0][1][0].dateStr, '2018-11-04'); // 2018-11的第二周第一天：11-04
     toEqual(res[7][1][0].dateStr, '2019-06-02'); // 2019-06的第二周第一天：06-02
     toEqual(res[12][1][0].dateStr, '2019-11-03'); // 2019-11的第二周第一天：11-03
+    toEqual(res[0][3][2].today, true); // 2018-11-20选中
+    toEqual(res[1][3][4].today, false); // 2018-12-20不选中
+    toEqual(res[7][3][4].today, false); // 2019-06-02不选中
+    toEqual(res[12][3][3].today, false); // 2019-11-20不选中
   });
   it('5 开始时间设为2018-11，时间间隔设置为对象，往前推1年1个月，获取到2017-11到2018-11月的数据', function () {
     var res = _index2.default.getCalendar(new Date(2018, 10), { year: 1, month: 1, past: true });
@@ -70,11 +74,13 @@ describe('CalendarHelper.getCalendar', function () {
     toEqual(res.length, 6);
     toEqual(res[1][0].dateStr, '2018-10-07');
   });
-  it('8 开始时间设为2018-11，时间间隔设置为对象，往前推1个月，获取到2018-10的数据', function () {
-    var res = _index2.default.getCalendar(new Date(2018, 10), -1);
+  it('8 开始时间设为2018-11，时间间隔设置为对象，往前推1个月，获取到2018-10的数据，2018-10-10不选中(设置当前时间为11-10)', function () {
+    var res = _index2.default.getCalendar(new Date(2018, 10), -1, { cur: new Date(2018, 10, 10) });
     toEqual(res.length, 5);
     toEqual(res[1][0].dateStr, '2018-10-07');
     toEqual(res[4][3].dateStr, '2018-10-31');
+    toEqual(res[1][3].dateStr, '2018-10-10');
+    toEqual(res[1][3].today, false);
   });
   it('9 开始时间设为2018-11，不设置时间间隔，获取到2018-11的数据', function () {
     var res = _index2.default.getCalendar(new Date(2018, 10).getTime());

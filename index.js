@@ -3,7 +3,7 @@
 import formatTools from 'format-tools';
 
 let getType = formatTools.getType;
-let getDateStr = formatTools.formatDate;
+let formatDate = formatTools.formatDate;
 
 /**
  * 格式化开始时间
@@ -11,7 +11,7 @@ let getDateStr = formatTools.formatDate;
  * @returns {Date} 格式化好的日期对象
  * */
 function formatStart(obj) {
-  let now = new Date();
+  let now = new Date();        
   let type = getType(obj);
   if (type === 'object' && (obj.year || obj.month)) {
     obj.year = obj.year || now.getFullYear();
@@ -135,9 +135,7 @@ let CalendarHelper = {
     let maxDays = CalendarHelper.getDays(date);
     let firstDayWeek = CalendarHelper.getMonthFirstWeek(date);
     let resultArr = [];
-    let curD = CalendarHelper.parseDate(curDate);
-    let today = curD.getDate();
-    let curYear = curD.getFullYear();
+    let curStr = formatDate(curDate);
     let weekLen = fixRows === true ? 6 : CalendarHelper.getWeeks(date);
 
     for (let w = 0; w < weekLen; w++) {
@@ -166,8 +164,6 @@ let CalendarHelper = {
         } else if (dayNum > maxDays) {   // 下个月
           day.curMonth = 1;
           day.date = new Date(year, month + 1, dayNum - maxDays);
-        } else if (dayNum === today && curYear === day.date.getFullYear()) {
-          day.today = true;
         }
         let tmpDate = day.date;
         day.ts = tmpDate.getTime();
@@ -177,8 +173,8 @@ let CalendarHelper = {
         day.week = tmpDate.getDay();
         day.weekIdx = CalendarHelper.getWeekByDate(tmpDate);
         day.days = CalendarHelper.getDays(tmpDate);
-        day.dateStr = getDateStr(tmpDate);
-
+        day.dateStr = formatDate(tmpDate);
+        if (day.dateStr === curStr) day.today = true;
         arr.push(day);
       }
       resultArr.push(arr);
