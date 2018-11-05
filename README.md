@@ -81,6 +81,9 @@ import calendarHelper from 'calendar-helper';
 - date: date|number|string 需要操作的时间，格式为Date类型或时间戳或时间戳字符串；
 - curDate: date|number|string 当前日期/需要选中的日期，格式为Date类型或时间戳或时间戳字符串；默认选中今天，表现在对象的today属性上
 - fixRows: boolean 是否需要固定周数，具体见getCalendar中的opts.fixRows；
+```js getMonthData
+let res = CalendarHelper.getMonthData(new Date(2018, 10)); // 获取2018-11月份的数据
+```
 
 ## 辅助方法
 上面两个是生成日历数据的主要方法，下面的方法是在生成数据过程中用到的，也封装起来对外提供：
