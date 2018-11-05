@@ -47,7 +47,7 @@ let CalendarHelper = {
   getCalendar(start, interval, opts) {
     opts = opts || {};
     start = formatStart(start);
-    let past = interval.past === true;
+    let past = interval && interval.past === true;
     interval = formatInterval(interval);
 
     opts.cur = CalendarHelper.parseDate(opts.cur);
@@ -368,5 +368,6 @@ Calendar.prototype = {
 };
 
 CalendarHelper.Calendar = Calendar;*/
+
 
 export default CalendarHelper;

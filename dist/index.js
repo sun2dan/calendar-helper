@@ -54,7 +54,7 @@ var CalendarHelper = {
   getCalendar: function getCalendar(start, interval, opts) {
     opts = opts || {};
     start = formatStart(start);
-    var past = interval.past === true;
+    var past = interval && interval.past === true;
     interval = formatInterval(interval);
 
     opts.cur = CalendarHelper.parseDate(opts.cur);
