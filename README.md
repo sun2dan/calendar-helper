@@ -8,7 +8,7 @@
 
 ## 安装
 ```js   
-$ npm install calender-helper
+$ npm install calendar-helper
 ```
 
 ## 数据结构
@@ -65,7 +65,7 @@ import calendarHelper from 'calendar-helper';
     - 数字表示往前/后取的月份数，正数为向前取，负数为向后取；    
 - opts: 其他设置参数
     - fixRows: boolean 是否需要固定周数，每月有四周或五周或六周，如果设置为true：则统一返回六周，其他的用下个月来补；如果设为false，则只返回具有当前月份周数的数据；这个参数的使用场景大体是这个：在切换年月时，日历高度(周数)保持不变； 
-    - cur: 类型为日期对象、时间戳或时间戳字符串 - 需要选中的当前时间； 
+    - cur: 类型为日期对象、时间戳或时间戳或时间戳字符串 - 需要选中时间； 
 ```js                     
     let date = new Date(2018, 10);
     CalendarHelper.getCalendar(date); // 获取2018-11月份的数据
@@ -79,7 +79,7 @@ import calendarHelper from 'calendar-helper';
 生成一个月的日历数据；
 返回值：如果获取一个月的数据，直接返回当月的二维数组数据；如果获取多个月的，返回符合条件的一个数组，数组每项是该月的二维数组数据；
 - date: date|number|string 需要操作的时间，格式为Date类型或时间戳或时间戳字符串；
-- curDate: date|number|string 当前日期/需要选中的日期，格式为Date类型或时间戳或时间戳字符串；默认选中今天，表现在对象的today属性上
+- curDate: date|number|string 需要选中的日期，格式为Date类型或时间戳或时间戳字符串；默认选中今天，表现在对象的today属性上
 - fixRows: boolean 是否需要固定周数，具体见getCalendar中的opts.fixRows；
 ```js getMonthData
 let res = CalendarHelper.getMonthData(new Date(2018, 10)); // 获取2018-11月份的数据

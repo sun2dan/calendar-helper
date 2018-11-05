@@ -1,6 +1,6 @@
 {
   "name": "calendar-helper",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "日历数据生成工具，calender helper, no view, only calender data and methods",
   "main": "dist/index.js",
   "files": [
