@@ -12,17 +12,14 @@
   "scripts": {
     "test": "mocha ./dist/test/test.js"
   },
-  "nyc": {
-    "include": [
-      "dist/test/test.js"
-    ]
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sun2dan/calendar-helper.git"
   },
   "keywords": [
     "calendar",
+    "utils",
+    "date",
     "calendar helper",
     "calendar tools",
     "calendar method",
