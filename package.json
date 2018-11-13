@@ -1,7 +1,7 @@
 {
   "name": "calendar-helper",
-  "version": "0.0.6",
-  "description": "日历数据生成工具，calender helper, no view, only calender data and methods",
+  "version": "0.0.7",
+  "description": "日历数据生成工具，不再为了繁琐的日期逻辑而烦恼，让你更专注于业务逻辑，同时提供了一些日期辅助方法；calendar data generator, no interface, only calendar data and methods",
   "main": "dist/index.js",
   "files": [
     "dist/index.js",
@@ -18,11 +18,13 @@
   },
   "keywords": [
     "calendar",
-    "utils",
+    "datepicker",
     "date",
+    "datepicker data",
+    "calendar generator",
     "calendar helper",
+    "calendar utils",
     "calendar tools",
-    "calendar method",
     "calendar data"
   ],
   "author": "sun2dan <supericesun@gmail.com>",
@@ -38,6 +40,6 @@
     "mocha": "^5.2.0"
   },
   "dependencies": {
-    "format-tools": "0.0.1"
+    "format-tools": "0.0.3"
   }
 }
