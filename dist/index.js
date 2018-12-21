@@ -3,15 +3,31 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+var getType = function getType(args) {
+  var type = Object.prototype.toString.call(args);
+  var result = type.replace(/\[object\s+(\w+)\]/gmi, "$1");
+  return result.toLowerCase();
+};
 
-var _formatTools = require('format-tools');
+var formatDate = function formatDate(date, splitChar) {
+  date = date || new Date();
+  splitChar = splitChar || '-';
 
-var _formatTools2 = _interopRequireDefault(_formatTools);
+  var type = getType(date);
+  if (type === "number") date = new Date(date);else if (type === 'string') date = new Date(parseInt(date));else if (type !== 'date') date = new Date();
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+  //var str = date.toString(); // Sun Apr 01 2018 21:57:48 GMT+0800 (CST)
+  var year = date.getFullYear();
+  var month = addZero(date.getMonth() + 1);
+  var day = addZero(date.getDate());
+  var res = year + '-' + month + '-' + day;
+  if (splitChar && splitChar !== '-') res = res.replace(/-/gmi, splitChar);
+  return res;
 
-var getType = _formatTools2.default.getType;
-var formatDate = _formatTools2.default.formatDate;
+  function addZero(n) {
+    return n < 10 ? '0' + n : n;
+  }
+};
 
 /**
  * 格式化开始时间

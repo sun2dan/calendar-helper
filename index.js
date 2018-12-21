@@ -1,9 +1,32 @@
 'use strict';
 
-import formatTools from 'format-tools';
+let getType = function (args) {
+  var type = Object.prototype.toString.call(args);
+  var result = type.replace(/\[object\s+(\w+)\]/gmi, "$1");
+  return result.toLowerCase();
+};
 
-let getType = formatTools.getType;
-let formatDate = formatTools.formatDate;
+let formatDate = function (date, splitChar) {
+  date = date || new Date();
+  splitChar = splitChar || '-';
+
+  var type = getType(date);
+  if (type === "number") date = new Date(date);
+  else if (type === 'string') date = new Date(parseInt(date));
+  else if (type !== 'date') date = new Date();
+
+  //var str = date.toString(); // Sun Apr 01 2018 21:57:48 GMT+0800 (CST)
+  var year = date.getFullYear();
+  var month = addZero(date.getMonth() + 1);
+  var day = addZero(date.getDate());
+  var res = year + '-' + month + '-' + day;
+  if (splitChar && splitChar !== '-') res = res.replace(/-/gmi, splitChar);
+  return res;
+
+  function addZero(n) {
+    return n < 10 ? '0' + n : n;
+  }
+};
 
 /**
  * 格式化开始时间
@@ -11,7 +34,7 @@ let formatDate = formatTools.formatDate;
  * @returns {Date} 格式化好的日期对象
  * */
 function formatStart(obj) {
-  let now = new Date();        
+  let now = new Date();
   let type = getType(obj);
   if (type === 'object' && (obj.year || obj.month)) {
     obj.year = obj.year || now.getFullYear();
