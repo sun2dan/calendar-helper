@@ -1,30 +1,10 @@
 'use strict';
 
-import CalendarHelper from '../index'
+//import CalendarHelper from '../index'
 //import formatTools from "format-tools";
+let CalendarHelper = require('../dist/index');
 //let assert = require('assert');
 let expect = require('chai').expect;
-let getDateStr = function (date, splitChar) {
-  date = date || new Date();
-  splitChar = splitChar || '-';
-
-  var type = getType(date);
-  if (type === "number") date = new Date(date);
-  else if (type === 'string') date = new Date(parseInt(date));
-  else if (type !== 'date') date = new Date();
-
-  //var str = date.toString(); // Sun Apr 01 2018 21:57:48 GMT+0800 (CST)
-  var year = date.getFullYear();
-  var month = addZero(date.getMonth() + 1);
-  var day = addZero(date.getDate());
-  var res = year + '-' + month + '-' + day;
-  if (splitChar && splitChar !== '-') res = res.replace(/-/gmi, splitChar);
-  return res;
-
-  function addZero(n) {
-    return n < 10 ? '0' + n : n;
-  }
-};
 
 describe('CalendarHelper.getCalendar', function () {
   /*
@@ -113,7 +93,7 @@ describe('CalendarHelper.parseDate', function () {
     let orig = CalendarHelper.parseDate(date);
     toEqual(orig.getTime(), date.getTime());  // 值相等
     date.setMonth(11);
-    expect(orig.getTime()).to.not.equal(date.getTime());    // 不等于原对象
+    toNotEqual(orig, date);    // 不等于原对象
   });
   it('3 传时间戳或时间戳字符串，得到一个日期对象', function () {
     let date = new Date(2018, 10, 1);
@@ -445,11 +425,37 @@ function toEqual(orig, compare) {
   expect(orig).to.equal(compare);
 }
 
+function toNotEqual(orig, compare) {
+  return expect(orig.getTime()).to.not.equal(compare.getTime());
+}
+
 function toDeepEqual(orig, compare) {
   expect(orig).to.deep.equal(compare);
 }
 
 function toBeA(orig, type) {
   expect(orig).to.be.a(type);
+}
+
+function getDateStr(date, splitChar) {
+  date = date || new Date();
+  splitChar = splitChar || '-';
+
+  var type = getType(date);
+  if (type === "number") date = new Date(date);
+  else if (type === 'string') date = new Date(parseInt(date));
+  else if (type !== 'date') date = new Date();
+
+  //var str = date.toString(); // Sun Apr 01 2018 21:57:48 GMT+0800 (CST)
+  var year = date.getFullYear();
+  var month = addZero(date.getMonth() + 1);
+  var day = addZero(date.getDate());
+  var res = year + '-' + month + '-' + day;
+  if (splitChar && splitChar !== '-') res = res.replace(/-/gmi, splitChar);
+  return res;
+
+  function addZero(n) {
+    return n < 10 ? '0' + n : n;
+  }
 }
 

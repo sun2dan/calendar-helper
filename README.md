@@ -4,7 +4,7 @@
 
 [![NPM](https://nodei.co/npm/calendar-helper.png)](https://nodei.co/npm/calendar-helper/)
 
-一个获取日历数据的工具；
+一个生成日历数据的工具；
 
 ## 安装
 ```js   
@@ -43,7 +43,32 @@ $ npm install calendar-helper
 
 ## 引用
 ```js
-import calendarHelper from 'calendar-helper';
+var calendarHelper = require('calendar-helper'); // 浏览器中引用
+```
+```js
+var calendarHelper = require('calendar-helper'); // require引用
+```
+### 浏览器
+```html 浏览器
+<script src='./dist/index.js'></script>
+```
+以amd或cmd模式引入，如果环境不支持amd或cmd，挂载到window上，window.calendarHelper；
+
+<a href='https://sun2dan.github.io/calendar-helper/test/index.html' target='_blank'>点击此处查看测试页面</a>
+
+```js amd+cmd+原生
+  // seajs测试
+  seajs.use('calendarHelper', function (calendarHelper) {
+    console.log(calendarHelper);
+  });
+  
+  // requirejs 测试
+  requirejs(['calendarHelper'], function (calendarHelper) {
+    console.log(calendarHelper);
+  });
+  
+  // 浏览器原生
+  console.log(window.calendarHelper);
 ```
 
 ## 主方法
@@ -169,3 +194,7 @@ date: date|number|string 需要操作的时间，格式为Date类型或时间戳
 $ npm test
 ```
 
+## 重要版本变更
+- 0.1.0：默认引用路径改为require方式，import路径改为'calendar-helper/index'
+
+- 0.0.x：在vue中引用，并未考虑require的情况
