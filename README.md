@@ -42,17 +42,19 @@ $ npm install calendar-helper
 ```
 
 ## 引用
-```js
-var calendarHelper = require('calendar-helper'); // 浏览器中引用
-```
+### Node
 ```js
 var calendarHelper = require('calendar-helper'); // require引用
 ```
+```js
+import CalendarHelper from 'calendar-helper/index'; // vue引用
+```
+
 ### 浏览器
 ```html 浏览器
 <script src='./dist/index.js'></script>
 ```
-以amd或cmd模式引入，如果环境不支持amd或cmd，挂载到window上，window.calendarHelper；
+以 amd 或 cmd 模式引入，如果环境不支持 amd 或 cmd，挂载到window上，window.calendarHelper；
 
 <a href='https://sun2dan.github.io/calendar-helper/test/index.html' target='_blank'>点击此处查看测试页面</a>
 
