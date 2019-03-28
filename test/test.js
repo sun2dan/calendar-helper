@@ -81,6 +81,15 @@ describe('CalendarHelper.getCalendar', function () {
     toEqual(res[0][4].dateStr, '2018-11-01');
     toEqual(res[4][6].dateStr, '2018-12-01');
   });
+  it('10 开始时间设为2018-11，设置时间间隔为1，获取到2018-11的数据，按周一到周日排序', function () {
+    let res = CalendarHelper.getCalendar(new Date(2018, 10).getTime(), 1, {monday: true});
+    toEqual(res.length, 5);
+    toEqual(res[0].length, 7);
+    toEqual(res[0][0].week, 1); // 第一行第一天为周一，1
+    toEqual(res[0][6].week, 0); // 第一行最后一天为周日，0
+    toEqual(res[0][3].dateStr, '2018-11-01');
+    toEqual(res[4][5].dateStr, '2018-12-01');
+  });
 });
 
 describe('CalendarHelper.parseDate', function () {
@@ -245,6 +254,78 @@ describe('CalendarHelper.getMonthData', function () {
       toEqual(item, getDateStr(now));
     });
   });
+  it('4 获取2018年11月份的日历数据，并选中30号，不固定行数，按周一到周日排序', function () {
+    let compare = {
+      prevLastDay: {
+        curMonth: -1, // 是否为当前月
+        today: false, // 是否为当前日期
+        date: new Date(2018, 9, 31), // 日期对象
+        ts: new Date(2018, 9, 31).getTime(),  //时间戳
+        year: 2018,  // 年
+        month: 10, //月 1-12
+        day: 31,   // 日    1-31
+        week: 3,   //周几   0-6
+        weekIdx: 5, // 当月的第几周 1-6
+        days: 31,// 当月天数 28-31
+        dateStr: '2018-10-31', // 日期字符串
+      },
+      curFirstDay: {
+        curMonth: 0,
+        today: false,
+        date: new Date(2018, 10, 1),
+        ts: new Date(2018, 10, 1).getTime(),
+        year: 2018,
+        month: 11,
+        day: 1,
+        week: 4,
+        weekIdx: 1,
+        days: 30,
+        dateStr: '2018-11-01',
+      },
+      curLastDay: {
+        curMonth: 0,
+        today: true,
+        date: new Date(2018, 10, 30),
+        ts: new Date(2018, 10, 30).getTime(),
+        year: 2018,
+        month: 11,
+        day: 30,
+        week: 5,
+        weekIdx: 5,
+        days: 30,
+        dateStr: '2018-11-30',
+      },
+      lastFirstDay: {
+        curMonth: 1,
+        today: false,
+        date: new Date(2018, 11, 1),
+        ts: new Date(2018, 11, 1).getTime(),
+        year: 2018,
+        month: 12,
+        day: 1,
+        week: 6,
+        weekIdx: 1,
+        days: 31,
+        dateStr: '2018-12-01',
+      }
+    };
+    let cur = new Date(2018, 10, 30);
+
+    let orig = CalendarHelper.getMonthData(new Date(2018, 10), cur, false, true);
+    toEqual(orig.length, 5); // 5周/行
+    toEqual(orig[0].length, 7); // 7列
+
+    let prevLastDay = orig[0][2]; // 10-31
+    let curFirstDay = orig[0][3];  // 11-30
+    let curLastDay = orig[4][4];  // 11-30
+    let lastFirstDay = orig[4][5];  // 12-01
+
+    let arr = ['prevLastDay', 'curFirstDay', 'curLastDay', 'lastFirstDay'];
+    [prevLastDay, curFirstDay, curLastDay, lastFirstDay].forEach((item, i) => {
+      let key = arr[i];
+      toDeepEqual(item, compare[key]);
+    });
+  });
 });
 
 describe('CalendarHelper.getDays', function () {
@@ -269,31 +350,59 @@ describe('CalendarHelper.getDays', function () {
 });
 
 describe('CalendarHelper.getWeeks', function () {
-  it('1 2018年11月有5周', function () {
-    let orig = CalendarHelper.getWeeks(new Date(2018, 10));
+  it('1.1 按周日到周六排序，2019年3月有6周', function () {
+    let orig = CalendarHelper.getWeeks(new Date(2019, 2));
+    toEqual(orig, 6);
+  });
+  it('1.2 按周一到周日排序，2019年2月有5周', function () {
+    let orig = CalendarHelper.getWeeks(new Date(2019, 2), true);
     toEqual(orig, 5);
   });
-  it('2 2018年12月有6周', function () {
+
+  it('2.1 按周日到周六排序，2018年12月有6周', function () {
     let orig = CalendarHelper.getWeeks(new Date(2018, 11));
     toEqual(orig, 6);
   });
-  it('3 2026年2月有4周', function () {
+  it('2.2 按周一到周日排序，2018年12月有6周', function () {
+    let orig = CalendarHelper.getWeeks(new Date(2018, 11), true);
+    toEqual(orig, 6);
+  });
+
+  it('3.1 按周日到周六排序，2026年2月有4周', function () {
     let orig = CalendarHelper.getWeeks(new Date(2026, 1));
     toEqual(orig, 4);
+  });
+  it('3.2 按周一到周日排序，2026年2月有5周', function () {
+    let orig = CalendarHelper.getWeeks(new Date(2026, 1), true);
+    toEqual(orig, 5);
   });
 });
 
 describe('CalendarHelper.getWeekByDate', function () {
-  it('1 2018年11月1号在当月第1周', function () {
-    let orig = CalendarHelper.getWeekByDate(new Date(2018, 10, 1));
+  it('1.1 按周日到周六排序，2018年11月4号在当月第2周', function () {
+    let orig = CalendarHelper.getWeekByDate(new Date(2018, 10, 4));
+    toEqual(orig, 2);
+  });
+  it('1.2 按周一到周日排序，2018年11月4号在当月第1周', function () {
+    let orig = CalendarHelper.getWeekByDate(new Date(2018, 10, 4), true);
     toEqual(orig, 1);
   });
-  it('2 2018年11月22号在当月第4周', function () {
-    let orig = CalendarHelper.getWeekByDate(new Date(2018, 10, 22));
+
+  it('2.1 按周日到周六排序，2018年11月19号在当月第4周', function () {
+    let orig = CalendarHelper.getWeekByDate(new Date(2018, 10, 19));
     toEqual(orig, 4);
   });
-  it('3 2018年11月30号在第5周', function () {
-    let orig = CalendarHelper.getWeekByDate(new Date(2018, 10, 30));
+  it('2.2 按周一到周日排序，2018年11月19号在当月第4周', function () {
+    let orig = CalendarHelper.getWeekByDate(new Date(2018, 10, 19), true);
+    toEqual(orig, 4);
+  });
+
+  it('3.1 按周日到周六排序，2019年3月31号在第6周', function () {
+    let orig = CalendarHelper.getWeekByDate(new Date(2019, 2, 31));
+    toEqual(orig, 6);
+  });
+  it('3.2 按周一到周日排序，2019年3月31号在第5周', function () {
+    let orig = CalendarHelper.getWeekByDate(new Date(2019, 2, 31), true);
     toEqual(orig, 5);
   });
 });

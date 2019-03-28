@@ -81,7 +81,7 @@ let CalendarHelper = {
     let arr = [];
     for (let i = 0; i < interval; i++) {
       let curDate = CalendarHelper.addMonth(start, i);
-      let resArr = CalendarHelper.getMonthData(curDate, opts.cur, opts.fixRows);
+      let resArr = CalendarHelper.getMonthData(curDate, opts.cur, opts.fixRows, opts.monday);
       arr.push(resArr);
     }
     if (arr.length === 1) arr = arr[0];
@@ -134,7 +134,8 @@ let CalendarHelper = {
    * 生成一个月的日历数据
    * @param {(date|number|string)} [d=new Date()] - 需要操作的时间，格式为Date类型或时间戳或时间戳字符串
    * @param {number} [curDate=new Date()] - 当前日期/需要选中的日期，默认选中今天，表现在对象的today属性上
-   * @param {boolean} [fixRows=false] - 是否需要固定周数，每月有四周或五周或六周，如果设置为true：则统一返回六周，其他的用下个月来补；如果设为false，则只返回当前月份的周数数据；
+   * @param {boolean} [fixRows=false] - 是否需要固定周数，每月有四周或五周或六周；默认为false，返回当前月份前后占用的实际周数数据；如果设置为true，则统一返回六周，其他的用下个月来补；
+   * @param {boolean} [monday=false] - 第一天是否为周一，即是否按照周一到周日的顺序排列数据；默认为false，按周日到周六的顺序排列；如果设置为true，则按照周一到周日的顺序排列；
    * @returns {Array} 生成的日历数据
    * 数组每一项属性：
    {
@@ -151,59 +152,63 @@ let CalendarHelper = {
         dateStr: String ('2018-10-31'), // 当前这一天的日期字符串
      };
    * */
-  getMonthData(d, curDate, fixRows) {
+  getMonthData(d, curDate, fixRows, monday) {
+    monday = monday === true;
     let date = d;
     let year = date.getFullYear();
     let month = date.getMonth();
-    let maxDays = CalendarHelper.getDays(date);
     let firstDayWeek = CalendarHelper.getMonthFirstWeek(date);
     let resultArr = [];
     let curStr = formatDate(curDate);
-    let weekLen = fixRows === true ? 6 : CalendarHelper.getWeeks(date);
+    let weekLen = fixRows === true ? 6 : CalendarHelper.getWeeks(date, monday);
+    let num = 0;
+    if (monday) {
+      firstDayWeek = firstDayWeek || 7;
+      num = 1;
+    }
 
     for (let w = 0; w < weekLen; w++) {
       let arr = [];
       for (let d = 0; d < 7; d++) {
         let index = w * 7 + d;
-        let dayNum = index - firstDayWeek + 1;
-        let day = {
-          curMonth: 0, // 是否为当前月
-          today: false, // 是否为当前日期
-          date: new Date(year, month, dayNum), // 日期对象
-
-          ts: 0,  //时间戳
-          year: 2018,  // 年
-          month: 1, //月 1-12
-          day: 1,   // 日    1-31
-          week: 0,   //周几   0-6
-          weekIdx: 1, // 当月的第几周 1-6
-          days: 31,// 当月天数 28-31
-          dateStr: '2018-10-31', // 日期字符串
-        };
-
-        if (w === 0 && d < firstDayWeek) { // 上个月
-          day.curMonth = -1;
-          day.date = new Date(year, month, -firstDayWeek + d + 1);
-        } else if (dayNum > maxDays) {   // 下个月
-          day.curMonth = 1;
-          day.date = new Date(year, month + 1, dayNum - maxDays);
-        }
-        let tmpDate = day.date;
-        day.ts = tmpDate.getTime();
-        day.year = tmpDate.getFullYear();
-        day.month = tmpDate.getMonth() + 1;
-        day.day = tmpDate.getDate();
-        day.week = tmpDate.getDay();
-        day.weekIdx = CalendarHelper.getWeekByDate(tmpDate);
-        day.days = CalendarHelper.getDays(tmpDate);
-        day.dateStr = formatDate(tmpDate);
-        if (day.dateStr === curStr) day.today = true;
+        let dayNum = index - firstDayWeek + 1 + num;
+        let day = createDay(dayNum);
         arr.push(day);
       }
       resultArr.push(arr);
     }
 
     return resultArr;
+
+    function createDay(_dayNum) {
+      let day = {
+        curMonth: 0, // 是否为当前月
+        today: false, // 是否为当前日期
+        date: new Date(year, month, _dayNum), // 日期对象
+
+        ts: 0,  //时间戳
+        year: 2018,  // 年
+        month: 1, //月 1-12
+        day: 1,   // 日    1-31
+        week: 0,   //周几   0-6
+        weekIdx: 1, // 当月的第几周 1-6
+        days: 31,// 当月天数 28-31
+        dateStr: '2018-10-31', // 日期字符串
+      };
+
+      let tmpDate = day.date;
+      day.ts = tmpDate.getTime();
+      day.year = tmpDate.getFullYear();
+      day.month = tmpDate.getMonth() + 1;
+      day.curMonth = day.month - month - 1;
+      day.day = tmpDate.getDate();
+      day.week = tmpDate.getDay();
+      day.weekIdx = CalendarHelper.getWeekByDate(tmpDate, monday);
+      day.days = CalendarHelper.getDays(tmpDate);
+      day.dateStr = formatDate(tmpDate);
+      if (day.dateStr === curStr) day.today = true;
+      return day;
+    }
   },
 
   /**
@@ -223,26 +228,34 @@ let CalendarHelper = {
   /**
    * 获取某个月前后占用的周数
    * @param {(date|number|string)} [d=new Date()] - 需要操作的时间，格式为Date类型或时间戳或时间戳字符串
+   * @param {boolean} [monday=false] - 第一天是否为周一，即是否按照周一到周日的顺序排列数据；默认为false，按周日到周六的顺序排列；如果设置为true，则按照周一到周日的顺序排列；
    * @returns {Number} 返回当前年月所占用的周数
    * */
-  getWeeks(d) {
+  getWeeks(d, monday) {
     let date = CalendarHelper.parseDate(d);
     date.setDate(1);
     date.setMonth(date.getMonth() + 1);
     date.setDate(0);
-    return CalendarHelper.getWeekByDate(date);
+    return CalendarHelper.getWeekByDate(date, monday);
   },
 
   /**
    * 获取一个日期在这个月属于第几周
    * @param {(date|number|string)} [d=new Date()] - 需要操作的时间，格式为Date类型或时间戳或时间戳字符串
+   * @param {boolean} [monday=false] - 第一天是否为周一，即是否按照周一到周日的顺序排列数据；默认为false，按周日到周六的顺序排列；如果设置为true，则按照周一到周日的顺序排列；
    * @returns {Number} 返回第几周
    * */
-  getWeekByDate(d) {
+  getWeekByDate(d, monday) {
+    monday = monday === true;
     let date = CalendarHelper.parseDate(d);
     let firstDayWeek = CalendarHelper.getMonthFirstWeek(date);
     let days = date.getDate();
-    let count = (days + firstDayWeek - 1) / 7;
+    let count = 0;
+    if (!monday) count = (days + firstDayWeek - 1) / 7
+    else {
+      firstDayWeek = firstDayWeek || 7;
+      count = (days + firstDayWeek - 2) / 7;
+    }
     return parseInt(count) + 1;
   },
 
@@ -297,96 +310,6 @@ let CalendarHelper = {
     let date = CalendarHelper.addYear(d, 1);
     return CalendarHelper.getCalendar(date, 1, {cur: cur,});
   },
-
-  /**
-   * 获取一个时间前后范围的日历数据，不包括本月
-   * @param {(date|number|string)} [d=new Date()] - 需要操作的时间，格式为Date类型或时间戳或时间戳字符串
-   * @param {number} [count=1] - 如果count为正，往后取月份；如果count为负，往前取月份；
-   * @param {(date|number|string)} [cur=new Date()] - 需要选中的日期
-   * @returns {Number} 返回符合条件这个时间段的日历数据
-   * */
-  /*getAddMonthRangeData(d, count, cur) {
-    count = count || 1;
-    if (count >= 0) {
-      let date = CalendarHelper.addMonth(d, 1);
-      return CalendarHelper.getCalendar(date, count, {cur: cur});
-    } else {
-      count = -count;
-      let date = CalendarHelper.addMonth(d, -count);
-      return CalendarHelper.getCalendar(date, count, {cur: cur});
-    }
-  },*/
-  /**
-   * 获取一个时间前后范围的日历数据，不包括本年
-   * @param {(date|number|string)} [d=new Date()] - 需要操作的时间，格式为Date类型或时间戳或时间戳字符串
-   * @param {number} [count=1] - 如果count为正，往后取月份；如果count为负，往前取月份；
-   * @param {(date|number|string)} [cur=new Date()] - 需要选中的日期
-   * @returns {Number} 返回符合条件这个时间段的日历数据
-   * */
-  /*getAddYearRangeData(d, count, cur) {
-    count = count || 1;
-    if (count >= 0) {  // nextYear
-      let date = CalendarHelper.addYear(d, 1);
-      return CalendarHelper.getCalendar(start, count * 12, {cur: cur});
-    } else {   // prevYear
-      count = -count;
-      let date = CalendarHelper.addYear(d, -count);
-      return CalendarHelper.getCalendar(date, count * 12, {cur: cur,});
-    }
-  },*/
 };
-
-/*let Calendar = function (opts) {
-  this.init(opts);
-};
-Calendar.prototype = {
-  constructor: Calendar,
-  data: [],
-  opts: {}, // 参数
-  curDate: {},
-
-  init(opts) {
-    this.data = init(opts);
-    this.opts = opts;
-    this.curDate = this.opts.cur;
-  },
-
-  // 设置对象的当前时间，影响prevMonth、nextMonth、prevYear、nextYear
-  setNowDate(d) {
-    this.opts.cur = CalendarHelper.parseDate(d);
-    return init(this.opts)
-  },
-
-  // 获取前几个月的数据(相对于curDate)
-  prevMonth(count) {
-    let cur = this.curDate;
-    this.data = CalendarHelper.prevMonth(cur, count, cur);
-    return this.data;
-  },
-
-  // 获取后几个月的数据
-  nextMonth(count) {
-    let cur = this.curDate;
-    this.data = CalendarHelper.nextMonth(cur, count, cur);
-    return this.data;
-  },
-
-  // 获取往前一年的数据
-  prevYear(count) {
-    let cur = this.curDate;
-    this.data = CalendarHelper.prevYear(cur, count, cur);
-    return this.data;
-  },
-
-  // 获取往后一年的数据
-  nextYear(count) {
-    let cur = this.curDate;
-    this.data = CalendarHelper.prevYear(cur, count, cur);
-    return this.data;
-  },
-};
-
-CalendarHelper.Calendar = Calendar;*/
-
 
 export default CalendarHelper;
