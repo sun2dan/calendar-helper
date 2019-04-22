@@ -182,25 +182,25 @@ date: date|number|string 需要操作的时间，格式为Date类型或时间戳
 ### 8. prevMonth(date, cur)
 获取上个月的数据
 - date: date|number|string 需要操作的时间，格式为Date类型或时间戳或时间戳字符串；
-- cur:date|number|string 需要选中的日期;
+- cur: date|number|string 需要选中的日期;
 返回值：Array，上个月的二维数组日历数据；
 
 ### 9. nextMonth(date, cur)
 获取下个月的数据
 - date: date|number|string 需要操作的时间，格式为Date类型或时间戳或时间戳字符串；
-- cur:date|number|string 需要选中的日期;
+- cur: date|number|string 需要选中的日期;
 返回值：Array，下个月的二维数组日历数据；
 
 ### 10. prevYear(date, cur)
 获取去年这个月份的数据
 - date: date|number|string 需要操作的时间，格式为Date类型或时间戳或时间戳字符串；
-- cur:date|number|string 需要选中的日期;
+- cur: date|number|string 需要选中的日期;
 返回值：Array，获取去年这个月份的二维数组日历数据；
 
 ### 11. nextYear(date, cur)
 获取明年这个月份的数据
 - date: date|number|string 需要操作的时间，格式为Date类型或时间戳或时间戳字符串；
-- cur:date|number|string 需要选中的日期;
+- cur: date|number|string 需要选中的日期;
 返回值：Array，获取明年这个月份的二维数组日历数据；
 
 

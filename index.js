@@ -67,7 +67,7 @@ let CalendarHelper = {
    * @param {object} [opts] - 其他配置对象
    * @returns {Array} 日历数组，获取一个月时，返回单月以周为单位的数组；获取多个月时，返回数组，数组的每一项是以周为单位的数组，
    * */
-  getCalendar(start, interval, opts) {
+  getCalendar: function (start, interval, opts) {
     opts = opts || {};
     start = formatStart(start);
     let past = interval && (interval.past === true) || interval < 0;
@@ -93,7 +93,7 @@ let CalendarHelper = {
    * @param {(date|string|number)} [date=new Date()] - 需要格式化的日期
    * @returns {Date} 格式化好的时间
    * */
-  parseDate(date) {
+  parseDate: function (date) {
     let type = getType(date);
     if (type === 'number') date = new Date(date);
     else if (type === 'string') date = new Date(parseInt(date));
@@ -107,7 +107,7 @@ let CalendarHelper = {
    * @param {number} [count=1] - 需要添加的月份
    * @returns {Date} 添加月份之后的时间
    * */
-  addMonth(d, count) {
+  addMonth: function (d, count) {
     count = getType(count) === 'number' ? count : 1;
     let date = CalendarHelper.parseDate(d);
     date.setDate(1);
@@ -122,7 +122,7 @@ let CalendarHelper = {
    * @param {number} [count=1] - 需要添加的年
    * @returns {Date} 添加年份之后的时间
    * */
-  addYear(d, count) {
+  addYear: function (d, count) {
     count = count || 1;
     let date = CalendarHelper.parseDate(d);
     let y = date.getFullYear();
@@ -152,7 +152,7 @@ let CalendarHelper = {
         dateStr: String ('2018-10-31'), // 当前这一天的日期字符串
      };
    * */
-  getMonthData(d, curDate, fixRows, monday) {
+  getMonthData: function (d, curDate, fixRows, monday) {
     monday = monday === true;
     let date = d;
     let year = date.getFullYear();
@@ -216,7 +216,7 @@ let CalendarHelper = {
    * @param {(date|number|string)} [d=new Date()] - 需要操作的时间，格式为Date类型或时间戳或时间戳字符串
    * @returns {Number} 返回当前年月的天数
    * */
-  getDays(d) {
+  getDays: function (d) {
     let date = CalendarHelper.parseDate(d);
     let month = date.getMonth();
     date.setDate(1);
@@ -231,7 +231,7 @@ let CalendarHelper = {
    * @param {boolean} [monday=false] - 第一天是否为周一，即是否按照周一到周日的顺序排列数据；默认为false，按周日到周六的顺序排列；如果设置为true，则按照周一到周日的顺序排列；
    * @returns {Number} 返回当前年月所占用的周数
    * */
-  getWeeks(d, monday) {
+  getWeeks: function (d, monday) {
     let date = CalendarHelper.parseDate(d);
     date.setDate(1);
     date.setMonth(date.getMonth() + 1);
@@ -245,7 +245,7 @@ let CalendarHelper = {
    * @param {boolean} [monday=false] - 第一天是否为周一，即是否按照周一到周日的顺序排列数据；默认为false，按周日到周六的顺序排列；如果设置为true，则按照周一到周日的顺序排列；
    * @returns {Number} 返回第几周
    * */
-  getWeekByDate(d, monday) {
+  getWeekByDate: function (d, monday) {
     monday = monday === true;
     let date = CalendarHelper.parseDate(d);
     let firstDayWeek = CalendarHelper.getMonthFirstWeek(date);
@@ -264,7 +264,7 @@ let CalendarHelper = {
    * @param {(date|number|string)} [d=new Date()] - 需要操作的时间，格式为Date类型或时间戳或时间戳字符串
    * @returns {Number} 返回周几（0-6）
    * */
-  getMonthFirstWeek(d) {
+  getMonthFirstWeek: function (d) {
     let date = CalendarHelper.parseDate(d);
     date.setDate(1);
     return date.getDay();
@@ -276,7 +276,7 @@ let CalendarHelper = {
    * @param {(date|number|string)} [cur=new Date()] - 需要选中的日期
    * @returns {Array} 返回这几个月的日历数据
    * */
-  prevMonth(d, cur) {
+  prevMonth: function (d, cur) {
     let date = CalendarHelper.addMonth(d, -1);
     return CalendarHelper.getCalendar(date, 1, {cur: cur});
   },
@@ -286,7 +286,7 @@ let CalendarHelper = {
    * @param {(date|number|string)} [cur=new Date()] - 需要选中的日期
    * @returns {Array} 返回符合条件这个时间段的日历数据
    * */
-  nextMonth(d, cur) {
+  nextMonth: function (d, cur) {
     let date = CalendarHelper.addMonth(d, 1);
     return CalendarHelper.getCalendar(date, 1, {cur: cur});
   },
@@ -296,7 +296,7 @@ let CalendarHelper = {
    * @param {(date|number|string)} [cur=new Date()] - 需要选中的日期
    * @returns {Array} 返回符合条件这个时间段的日历数据
    * */
-  prevYear(d, cur) {
+  prevYear: function (d, cur) {
     let date = CalendarHelper.addYear(d, -1);
     return CalendarHelper.getCalendar(date, 1, {cur: cur,});
   },
@@ -306,7 +306,7 @@ let CalendarHelper = {
    * @param {(date|number|string)} [cur=new Date()] - 需要选中的日期
    * @returns {Array} 返回符合条件这个时间段的日历数据
    * */
-  nextYear(d, cur) {
+  nextYear: function (d, cur) {
     let date = CalendarHelper.addYear(d, 1);
     return CalendarHelper.getCalendar(date, 1, {cur: cur,});
   },
