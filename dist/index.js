@@ -35,66 +35,7 @@
     }
   };
 
-  /**
-   * 格式化开始时间
-   * @param {(date|object)} [obj] - 需要格式化的对象
-   * @returns {Date} 格式化好的日期对象
-   * */
-  function formatStart(obj) {
-    let now = new Date();
-    let type = getType(obj);
-    if (type === 'object' && (obj.year || obj.month)) {
-      obj.year = obj.year || now.getFullYear();
-      obj.month = obj.month || now.getMonth() + 1;
-      return new Date(obj.year, obj.month - 1, 1);
-    }
-    return CalendarHelper.parseDate(obj);
-  }
-
-  /**
-   * 格式化时间间隔
-   * @param {(date|object)} [obj=new Date()] - 需要格式化的日期
-   * @returns {string} 格式化好的时间间隔（月份的个数）
-   * */
-  function formatInterval(obj) {
-    let type = getType(obj);
-    if (type === 'number') return obj;
-    else if (type === 'object' && (obj.year || obj.month)) {
-      obj.year = obj.year || 0;
-      obj.month = obj.month || 1;
-      return obj.year * 12 + obj.month;
-    } else return 1;
-  }
-
   let CalendarHelper = {
-    /**
-     * 根据参数配置获取日历数据
-     * @param {object|number|string} [start] - 开始时间
-     * @param {object} [interval] - 以开始时间为基准，需要往前或往后取固定年/月份；为正往后取，为负往前取
-     * @param {object} [opts] - 其他配置对象
-     * @returns {Array} 日历数组，获取一个月时，返回单月以周为单位的数组；获取多个月时，返回数组，数组的每一项是以周为单位的数组，
-     * */
-    getCalendar: function (start, interval, opts) {
-      opts = opts || {};
-      start = formatStart(start);
-      let past = interval && (interval.past === true) || interval < 0;
-      interval = Math.abs(formatInterval(interval));
-
-      opts.cur = CalendarHelper.parseDate(opts.cur);
-      let end = CalendarHelper.addMonth(start, past ? -interval : interval);
-      if (past) start = end;
-      opts.fixRows = opts.fixRows === true;
-
-      let arr = [];
-      for (let i = 0; i < interval; i++) {
-        let curDate = CalendarHelper.addMonth(start, i);
-        let resArr = CalendarHelper.getMonthData(curDate, opts.cur, opts.fixRows, opts.monday);
-        arr.push(resArr);
-      }
-      if (arr.length === 1) arr = arr[0];
-      return arr;
-    },
-
     /**
      * 将时间戳转换为日期；如果是date类型，复制一个日期返回；参数不合法时，返回当前时间
      * @param {(date|string|number)} [date=new Date()] - 需要格式化的日期
@@ -106,35 +47,6 @@
       else if (type === 'string') date = new Date(parseInt(date));
       else if (type !== 'date') date = new Date();
       return new Date(date.getTime());
-    },
-
-    /**
-     * 在起始时间上往后推count个月份，只考虑年月，不考虑日/天数，即月份+1，年适时+1，日改为1；比如需要在2018-10-31往后推一个月，得到的是2018-11-01；
-     * @param {(date|number|string)} [d=new Date()] - 需要操作的时间，格式为Date类型或时间戳或时间戳字符串
-     * @param {number} [count=1] - 需要添加的月份
-     * @returns {Date} 添加月份之后的时间
-     * */
-    addMonth: function (d, count) {
-      count = getType(count) === 'number' ? count : 1;
-      let date = CalendarHelper.parseDate(d);
-      date.setDate(1);
-      let m = date.getMonth();
-      date.setMonth(m + count);
-      return date;
-    },
-
-    /**
-     * 在起始时间上往后推count年，只考虑年，不考虑月日，即年+1，月不变，日改为1；比如需要在2004-02-29加一年，得到的是2005-02-01；
-     * @param {(date|number|string)} [d=new Date()] - 需要操作的时间，格式为Date类型或时间戳或时间戳字符串
-     * @param {number} [count=1] - 需要添加的年
-     * @returns {Date} 添加年份之后的时间
-     * */
-    addYear: function (d, count) {
-      count = count || 1;
-      let date = CalendarHelper.parseDate(d);
-      let y = date.getFullYear();
-      date.setFullYear(y + count);
-      return date;
     },
 
     /**
@@ -275,47 +187,6 @@
       let date = CalendarHelper.parseDate(d);
       date.setDate(1);
       return date.getDay();
-    },
-
-    /**
-     * 获取上个月的数据
-     * @param {(date|number|string)} [d=new Date()] - 需要操作的时间，格式为Date类型或时间戳或时间戳字符串
-     * @param {(date|number|string)} [cur=new Date()] - 需要选中的日期
-     * @returns {Array} 返回这几个月的日历数据
-     * */
-    prevMonth: function (d, cur) {
-      let date = CalendarHelper.addMonth(d, -1);
-      return CalendarHelper.getCalendar(date, 1, {cur: cur});
-    },
-    /**
-     * 获取下个月的数据
-     * @param {(date|number|string)} [d=new Date()] - 需要操作的时间，格式为Date类型或时间戳或时间戳字符串
-     * @param {(date|number|string)} [cur=new Date()] - 需要选中的日期
-     * @returns {Array} 返回符合条件这个时间段的日历数据
-     * */
-    nextMonth: function (d, cur) {
-      let date = CalendarHelper.addMonth(d, 1);
-      return CalendarHelper.getCalendar(date, 1, {cur: cur});
-    },
-    /**
-     * 获取去年这个月份的数据
-     * @param {(date|number|string)} [d=new Date()] - 需要操作的时间，格式为Date类型或时间戳或时间戳字符串
-     * @param {(date|number|string)} [cur=new Date()] - 需要选中的日期
-     * @returns {Array} 返回符合条件这个时间段的日历数据
-     * */
-    prevYear: function (d, cur) {
-      let date = CalendarHelper.addYear(d, -1);
-      return CalendarHelper.getCalendar(date, 1, {cur: cur,});
-    },
-    /**
-     * 获取明年这个月份的数据
-     * @param {(date|number|string)} [d=new Date()] - 需要操作的时间，格式为Date类型或时间戳或时间戳字符串
-     * @param {(date|number|string)} [cur=new Date()] - 需要选中的日期
-     * @returns {Array} 返回符合条件这个时间段的日历数据
-     * */
-    nextYear: function (d, cur) {
-      let date = CalendarHelper.addYear(d, 1);
-      return CalendarHelper.getCalendar(date, 1, {cur: cur,});
     },
   };
 
